@@ -197,4 +197,6 @@ sudo -E -u "${svc_user}" ./config.sh --unattended \
 echo
 echo "Starting runner ..."
 
-sudo -E -u "${svc_user}" ./run.sh
+while IFS= read -r line; do
+    echo "$line"
+done < <(sudo -E -u "${svc_user}" ./run.sh)
