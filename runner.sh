@@ -139,10 +139,23 @@ if [ "null" == "$RUNNER_TOKEN" ] || [ -z "$RUNNER_TOKEN" ]; then fatal "Failed t
 echo
 echo "Downloading latest runner ..."
 
+arch=""
+case "$(uname -m)" in
+    x86_64)
+        arch="x64"
+        ;;
+    arm64)
+        arch="arm64"
+        ;;
+    *)
+        fatal "Unsupported architecture"
+        ;;
+esac
+
 # For the GHES Alpha, download the runner from github.com
 latest_version_label=$(curl -s -X GET 'https://api.github.com/repos/actions/runner/releases/latest' | jq -r '.tag_name')
 latest_version="${latest_version_label:1}"
-runner_file="actions-runner-${runner_plat}-x64-${latest_version}.tar.gz"
+runner_file="actions-runner-${runner_plat}-${arch}-${latest_version}.tar.gz"
 
 if [ -f "${runner_file}" ]; then
     echo "${runner_file} exists. skipping download."
