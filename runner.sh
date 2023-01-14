@@ -4,6 +4,14 @@
 
 set -e
 
+trap "exit 1" USR1
+PROC="$$"
+
+fatal() {
+  echo "$@" >&2
+  kill -USR1 $PROC
+}
+
 # Notes:
 # PATS over envvars are more secure
 # Downloads latest runner release (not pre-release)
@@ -88,12 +96,6 @@ sudo echo
 #---------------------------------------
 runner_plat=linux
 [ -n "$(which sw_vers)" ] && runner_plat=osx;
-
-function fatal()
-{
-   echo "error: $1" >&2
-   exit 1
-}
 
 if [ -z "${runner_scope}" ]; then fatal "supply scope as argument 1"; fi
 if [ -z "${RUNNER_CFG_PAT}" ]; then fatal "RUNNER_CFG_PAT must be set before calling"; fi
@@ -210,6 +212,41 @@ sudo -E -u "${svc_user}" ./config.sh --unattended \
 echo
 echo "Starting runner ..."
 
+
+
+waiting=0
+running=0
+(
+    check_running() {
+        if [ $running -eq 1 ]; then
+            echo "Runner has picked up a job"
+            exit 0
+        fi
+    }
+
+    while [ $waiting -eq 0 ]; do
+        sleep 1
+        check_running
+    done
+
+    timeout=5
+    while [ $timeout -gt 0 ]; do
+        sleep 1
+        timeout=$((timeout-1))
+        check_running
+    done
+
+    echo "No job picked up after 5 seconds.  Exiting"
+    fatal
+) &
+
 while IFS= read -r line; do
     echo "$line"
+    if [[ "$line" == *"Listening for Jobs"* ]]; then
+        waiting=1
+        continue
+    fi
+    if [ $waiting -eq 1 ]; then
+        running=1
+    fi
 done < <(sudo -E -u "${svc_user}" ./run.sh)
