@@ -12,6 +12,9 @@ jobs:
       image: ubuntu-2004:current
     resource_class: arm.medium
 
+    environment:
+      GH_REPO: << pipeline.parameters.GH_REPO >>
+
     steps:
       - checkout
       - run: ./runner.sh
