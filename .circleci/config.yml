@@ -13,6 +13,6 @@ jobs:
     steps:
       - checkout
       - run: ./runner.sh
-          -s repo
+          -s "$GH_REPO"
           -n "circle-${CIRCLE_WORKFLOW_ID}"
           -d 

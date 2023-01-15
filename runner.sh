@@ -4,12 +4,9 @@
 
 set -e
 
-trap "exit 1" USR1
-PROC="$$"
-
 fatal() {
   echo "$@" >&2
-  kill -USR1 $PROC
+  exit 1
 }
 
 # Notes:
