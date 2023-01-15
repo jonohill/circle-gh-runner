@@ -16,3 +16,8 @@ jobs:
           -s "$GH_REPO"
           -n "circle-${CIRCLE_WORKFLOW_ID}"
           -d 
+
+workflows:
+  runner:
+    jobs:
+      - runner
