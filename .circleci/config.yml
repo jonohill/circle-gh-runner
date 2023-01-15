@@ -3,6 +3,7 @@ version: 2.1
 parameters:
   GH_REPO:
     type: string
+    default: ""
 
 jobs:
 
@@ -13,10 +14,12 @@ jobs:
 
     steps:
       - checkout
-      - run: ./runner.sh
-          -s "<< pipeline.parameters.GH_REPO >>"
-          -n "circle-${CIRCLE_WORKFLOW_ID}"
-          -d 
+      - run: |
+          echo "GH_REPO: << pipeline.parameters.GH_REPO >>"
+          ./runner.sh \
+            -s "<< pipeline.parameters.GH_REPO >>" \
+            -n "circle-${CIRCLE_WORKFLOW_ID}" \
+            -d 
 
 workflows:
   runner:
