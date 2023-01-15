@@ -214,7 +214,7 @@ timeout=3600
 while IFS= read -t $timeout -r line; do
     echo "$line"
     if [[ "$line" == *"Listening for Jobs"* ]]; then
-        timeout=5
+        timeout=60
         waiting=1
         continue
     fi
