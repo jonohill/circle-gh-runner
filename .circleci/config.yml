@@ -13,7 +13,7 @@ jobs:
     resource_class: arm.medium
 
     environment:
-      GH_REPO: << parameters.GH_REPO >>
+      GH_REPO: << pipeline.parameters.GH_REPO >>
 
     steps:
       - checkout
