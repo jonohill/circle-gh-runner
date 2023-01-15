@@ -212,41 +212,19 @@ sudo -E -u "${svc_user}" ./config.sh --unattended \
 echo
 echo "Starting runner ..."
 
-
-
 waiting=0
-running=0
-(
-    check_running() {
-        if [ $running -eq 1 ]; then
-            echo "Runner has picked up a job"
-            exit 0
-        fi
-    }
-
-    while [ $waiting -eq 0 ]; do
-        sleep 1
-        check_running
-    done
-
-    timeout=5
-    while [ $timeout -gt 0 ]; do
-        sleep 1
-        timeout=$((timeout-1))
-        check_running
-    done
-
-    echo "No job picked up after 5 seconds.  Exiting"
-    fatal
-) &
-
-while IFS= read -r line; do
+timeout=3600
+while IFS= read -t $timeout -r line; do
     echo "$line"
     if [[ "$line" == *"Listening for Jobs"* ]]; then
+        timeout=5
         waiting=1
         continue
     fi
-    if [ $waiting -eq 1 ]; then
-        running=1
-    fi
+    waiting=0
+    timeout=3600
 done < <(sudo -E -u "${svc_user}" ./run.sh)
+
+if [ $waiting -eq 1 ]; then
+    fatal "Runner never picked up a job"
+fi
