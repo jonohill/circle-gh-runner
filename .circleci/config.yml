@@ -1,14 +1,16 @@
 version: 2.1
 
+parameters:
+  GH_REPO:
+    type: string
+    default: ""
+
 jobs:
 
   runner:
     machine:
       image: ubuntu-2004:current
     resource_class: arm.medium
-
-    environment:
-      GH_REPO: $GHA_Meta
 
     steps:
       - checkout
